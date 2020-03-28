@@ -16,5 +16,5 @@ if [ "$action" == "debug" ]; then
     flask run --host 0.0.0.0 --port 8080
 else
     echo "Running in production mode"
-    exec /opt/bb/python/bin/gunicorn -w 4 -b 0.0.0.0:8080 web:app
+    exec gunicorn -w 4 -b 0.0.0.0:8080 web:app
 fi
