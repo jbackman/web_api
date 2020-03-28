@@ -8,7 +8,7 @@ import uuid
 import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
-from flask.ext.autodoc import Autodoc
+from flask_autodoc import Autodoc
 
 app = Flask(__name__)
 auto = Autodoc(app)
