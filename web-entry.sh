@@ -1,5 +1,6 @@
 #!/bin/sh
 action=""
+NAME="localhost"
 
 while getopts ":dn:" option
 do
