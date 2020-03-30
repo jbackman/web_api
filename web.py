@@ -78,7 +78,7 @@ def log():
 # Return current hostname
 @app.route('/name', methods=['GET'])
 @auto.doc()
-def myname()
+def myname():
   g.uuid = uuid.uuid1().hex
   try:
     return os.environ.get('NAME','Name not set')
