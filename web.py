@@ -27,8 +27,8 @@ def save_request(uuid, request):
   req_data['args'] = request.args
   req_data['form'] = request.form
   req_data['remote_addr'] = request.remote_addr
-  files = []
-  if requests.files is defined:
+  if request.files:
+    files = []
     for name, fs in request.files.iteritems():
       dst = tempfile.NamedTemporaryFile()
       fs.save(dst)
@@ -40,39 +40,22 @@ def save_request(uuid, request):
     req_data['files'] = files
   return req_data
 
-
-def save_response(uuid, resp):
-  resp_data = {}
-  resp_data['uuid'] = uuid
-  resp_data['status_code'] = resp.status_code
-  resp_data['status'] = resp.status
-  resp_data['headers'] = dict(resp.headers)
-  resp_data['data'] = resp.response
-  return resp_data
-
-
-@app.before_request
-def before_request():
-  print(request.method, request.endpoint)
-
-
 @app.after_request
 def after_request(resp):
   resp.headers.add('Access-Control-Allow-Origin', '*')
   resp.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-Token')
   resp.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-  resp_data = save_response(g.uuid, resp)
-  print('Response:: ', json.dumps(resp_data, indent=4))
   return resp
 
 # Return documentation
-@app.route('/', methods=['GET'])
-def default():
+@app.route('/', defaults={'u_path': ''})
+@app.route('/<path:u_path>')
+def default(u_path):
   return auto.html()
-   
-# Return client IP   
-@app.route('/ip', methods=['GET'])
+
+# Return client IP
 @auto.doc()
+@app.route('/ip', methods=['GET'])
 def ip():
   g.uuid = uuid.uuid1().hex
   try:
@@ -100,6 +83,6 @@ if __name__ == '__main__':
   parser.add_argument('-p', '--port', type=int, default=80,
                       help='port to listen on')
   parser.add_argument('-d', '--debug', type=bool, default=False,
-                      help='IP to listen on')                      
+                      help='IP to listen on')
   args = parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
