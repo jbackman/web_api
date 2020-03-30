@@ -75,6 +75,15 @@ def log():
   resp.set_cookie('cookie-name', value='cookie-value')
   return resp
 
+# Return current hostname
+@app.route('/name', methods=['GET'])
+@auto.doc()
+def myname()
+  g.uuid = uuid.uuid1().hex
+  try:
+    return os.environ.get('NAME','Name not set')
+  except:
+    return "Name not available", 501
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
@@ -83,6 +92,6 @@ if __name__ == '__main__':
   parser.add_argument('-p', '--port', type=int, default=80,
                       help='port to listen on')
   parser.add_argument('-d', '--debug', type=bool, default=False,
-                      help='IP to listen on')
+                      help='Set Debug on/off')
   args = parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
