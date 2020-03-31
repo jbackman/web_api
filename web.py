@@ -99,7 +99,7 @@ def myname():
 @auto.doc()
 def dnsquery():
   """
-  Dns over HTTP: example: dns-query?name=cnn.com
+  Dns over HTTP: example: /dns-query?name=cnn.com
   """
   g.uuid = uuid.uuid1().hex
   return "Documentation", 200
