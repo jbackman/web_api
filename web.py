@@ -102,7 +102,7 @@ def dnsquery():
   Dns over HTTP: example: dns-query?name=cnn.com
   """
   g.uuid = uuid.uuid1().hex
-  return "Documentation
+  return "Documentation", 200
   
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
