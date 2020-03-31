@@ -57,6 +57,9 @@ def default(u_path):
 @auto.doc()
 @app.route('/ip', methods=['GET'])
 def ip():
+  """
+  Returns the requester IP
+  """
   g.uuid = uuid.uuid1().hex
   try:
     headers_list = request.headers.getlist("X-Forwarded-For")
@@ -69,6 +72,9 @@ def ip():
 @app.route('/log', methods=['GET', 'POST'])
 @auto.doc()
 def log():
+  """
+  Log and print the HTTP request
+  """
   g.uuid = uuid.uuid1().hex
   req_data = save_request(g.uuid, request)
   resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
@@ -79,12 +85,25 @@ def log():
 @app.route('/name', methods=['GET'])
 @auto.doc()
 def myname():
+  """
+  Hostname of current server
+  """
   g.uuid = uuid.uuid1().hex
   try:
     return os.environ.get('NAME','Name not set')
   except:
     return "Name not available", 501
-
+  
+# Document doh-proxy
+@app.route('/dns-query', methods=['GET'])
+@auto.doc()
+def dnsquery():
+  """
+  Dns over HTTP: example: dns-query?name=cnn.com
+  """
+  g.uuid = uuid.uuid1().hex
+  return "Documentation
+  
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
   parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
