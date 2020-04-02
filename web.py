@@ -8,14 +8,13 @@ import uuid
 import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
-from flask_restx import Resource, Api
+from flask_restx import Resource, Api, reqparse
 import whois as whois_query
 
 app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
-
 
 def save_request(uuid, request):
   req_data = {}
@@ -124,10 +123,15 @@ class dnsq(Resource):
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
-    host = args.doh_host
-    port = args.doh_port
+  
+    if request.args.get('scheme') and request.args.get('scheme') in ('http','https'):
+      scheme = request.args.get('scheme')
+    else:
+      scheme = args.doh_secure  
+    password = request.args.get('password')
+    host = args.doh_host if request.args.get('host') is None else request.args.get('host')
+    port = args.doh_port if request.args.get('port') is None else request.args.get('port')
     name = name
-    scheme =  'http' if args.doh_secure else 'https'
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     try: 
       r = requests.get(url)
@@ -135,7 +139,8 @@ class dnsq(Resource):
       return "Cannot contact Dns over HTTP server", 501
                                                                                
     return "Documentation", 200
- 
+
+  
 # Whois endpoint
 @api.route('/whois/<string:whois_name>')
 class whois(Resource,):
@@ -154,19 +159,20 @@ class whois(Resource,):
     except:
       return "Whois not available", 501
 
+    
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Process cli options')
-  parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
+  cli_parser = argparse.ArgumentParser(description='Process cli options')
+  cli_parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
                       help='IP to listen on')
-  parser.add_argument('-p', '--port', type=int, default=5000,
+  cli_parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
-  parser.add_argument('-d', '--debug', type=bool, default=False,
+  cli_parser.add_argument('-d', '--debug', type=bool, default=False,
                       help='Set Debug on/off')
-  parser.add_argument('--doh-host', type=str, default='127.0.0.1',
+  cli_parser.add_argument('--doh-host', type=str, default='127.0.0.1',
                       help='DNS over http host')      
-  parser.add_argument('--doh-port', type=str, default='8053',
+  cli_parser.add_argument('--doh-port', type=str, default='8053',
                       help='DNS over http host')
-  parser.add_argument('--doh-secure', type=bool, default=False,
+  cli_parser.add_argument('--doh-secure', type=str, choices=['http', 'https'], default='http',
                       help='Use DNS over https')                                                                          
-  args = parser.parse_args()
+  args = cli_parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
