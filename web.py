@@ -69,7 +69,7 @@ class log(Resource):
   Log and print the HTTP request
   """
   
-  def __init__(self):
+  def __init__():
     g.uuid = uuid.uuid1().hex
     req_data = save_request(g.uuid, request)
     self.resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
