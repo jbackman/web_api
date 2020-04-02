@@ -128,7 +128,7 @@ class dnsq(Resource):
     port = args.port
     name = name
     scheme =  'http' if args.doh_secure else 'https'
-    url = f'{scheme}://{host}:{port}/dns-query?name={name}'
+    url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     try: 
       r = requests.get(url)
     except: 
