@@ -189,11 +189,18 @@ if __name__ == '__main__':
   cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
                       help='DNS over http scheme')                                                                          
   args = cli_parser.parse_args()
-  app.run(host=args.listen, port=args.port, debug=args.debug)
+  app.run(host=args.listen, 
+          port=args.port, 
+          debug=args.debug, 
+          doh_host = args.doh_host,
+          doh_port = args.doh_port,
+          doh_scheme = args.doh_scheme,
+         )
+  '''
   global doh_host
   global doh_port
   global doh_scheme
   doh_host = args.doh_host
   doh_port = args.doh_port
   doh_scheme = args.doh_scheme
-
+  '''
