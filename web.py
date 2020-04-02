@@ -16,12 +16,6 @@ api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
 
-api_parser = reqparse.RequestParser()
-api_parser.add_argument('host', type=str, help='DNS over http host')     
-api_parser.add_argument('port', type=str, help='DNS over http port')
-api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
-api_args = api_parser.parse_args()
-
 def save_request(uuid, request):
   req_data = {}
   req_data['uuid'] = uuid
@@ -126,6 +120,11 @@ class myname(Resource):
 @api.route('/dnsq/<string:name>')
 class dnsq(Resource):
   def get(self,name):
+    api_parser = reqparse.RequestParser()
+    api_parser.add_argument('host', type=str, help='DNS over http host')     
+    api_parser.add_argument('port', type=str, help='DNS over http port')
+    api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
+    api_args = api_parser.parse_args()
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
