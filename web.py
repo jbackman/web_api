@@ -150,6 +150,7 @@ class dnsq(Resource):
     port = args.doh_port if api_args.get('port') is None else api_args.get('port')
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
+    print(url)
     try: 
       r = requests.get(url)
     except: 
