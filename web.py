@@ -104,7 +104,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
   parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
                       help='IP to listen on')
-  parser.add_argument('-p', '--port', type=int, default=80,
+  parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
   parser.add_argument('-d', '--debug', type=bool, default=False,
                       help='Set Debug on/off')
