@@ -57,6 +57,8 @@ class ip(Resource):
   """
   def get(self):
     g.uuid = uuid.uuid1().hex
+    if app.debug:
+      print(request)
     try:
       headers_list = request.headers.getlist("X-Forwarded-For")
       user_ip = headers_list[0] if headers_list else request.remote_addr
