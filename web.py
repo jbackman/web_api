@@ -114,8 +114,8 @@ class dnsquery(Resource):
  
 # Whois endpoint
 @api.route('/whois/<string:whois_name>')
-class whois(Resource,**kwargs):
-  def get(self):
+class whois(Resource,):
+  def get(self,**kwargs):
     domain = whois_query.query('jitonline.net')
     return domain
 
