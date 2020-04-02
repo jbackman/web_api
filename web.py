@@ -113,10 +113,10 @@ class dnsquery(Resource):
     return "Documentation", 200
  
 # Whois endpoint
-@api.route('/whoisq/<string:whois_name>')
-class whoisq(Resource):
+@api.route('/whois/<string:whois_name>')
+class whois(Resource):
   def get(self):
-    domain = whois.query(whois_name)
+    domain = whois_query.query(whois_name)
     return domain
 
 
