@@ -117,8 +117,14 @@ class myname(Resource):
       return "Name not available", 501
   
 # DNS over HTTP 
+resource_fields = api.model('Resource', {
+    'host': fields.String,
+    'port': fields.String,
+    'scheme': fields.String
+})
 @api.route('/dnsq/<string:name>')
 class dnsq(Resource):
+  @api.expect(resource_fields)
   def get(self,name):
     api_parser = reqparse.RequestParser()
     api_parser.add_argument('host', type=str, help='DNS over http host')     
