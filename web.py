@@ -9,6 +9,7 @@ import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api
+import whois
 
 app = Flask(__name__)
 api = Api(app)
@@ -110,7 +111,15 @@ class dnsquery(Resource):
     """
     g.uuid = uuid.uuid1().hex
     return "Documentation", 200
-  
+ 
+# Whois endpoint
+@api.route('/whois?<string:whois_name>')
+class whois_query(Resource):
+  def get(self):
+    domain = whois.query(whois_name)
+    return domain
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
   parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
