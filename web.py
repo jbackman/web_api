@@ -16,6 +16,12 @@ api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
 
+api_parser = reqparse.RequestParser()
+api_parser.add_argument('host', type=str, help='DNS over http host')     
+api_parser.add_argument('port', type=str, help='DNS over http port')
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
+api_args = api_parser.parse_args()
+
 def save_request(uuid, request):
   req_data = {}
   req_data['uuid'] = uuid
@@ -123,7 +129,7 @@ class dnsq(Resource):
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
-  
+    """
     if request.args.get('scheme') and request.args.get('scheme') in ('http','https'):
       scheme = request.args.get('scheme')
     else:
@@ -131,6 +137,13 @@ class dnsq(Resource):
     password = request.args.get('password')
     host = args.doh_host if request.args.get('host') is None else request.args.get('host')
     port = args.doh_port if request.args.get('port') is None else request.args.get('port')
+    """
+    if api_args.get('scheme') and api_args.get('scheme') in ('http','https'):
+      scheme = api_args.get('scheme')
+    else:
+      scheme = args.doh_secure  
+    host = args.doh_host if api_args.get('host') is None else api_args.get('host')
+    port = args.doh_port if api_args.get('port') is None else api_args.get('port')
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     try: 
