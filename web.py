@@ -50,51 +50,55 @@ def after_request(resp):
 '''
 
 # Return client IP
-@api.route('/ip', methods=['GET'])
-def ip():
+@api.route('/ip')
+class ip(Resource):
   """
   Returns the requester IP
   """
-  g.uuid = uuid.uuid1().hex
-  try:
-    headers_list = request.headers.getlist("X-Forwarded-For")
-    user_ip = headers_list[0] if headers_list else request.remote_addr
-    return jsonify({'ip': user_ip}), 200
-  except:
-    return "IP not available", 501
+  def get(self):
+    g.uuid = uuid.uuid1().hex
+    try:
+      headers_list = request.headers.getlist("X-Forwarded-For")
+      user_ip = headers_list[0] if headers_list else request.remote_addr
+      return jsonify({'ip': user_ip}), 200
+    except:
+      return "IP not available", 501
 
 # Return data about the request
-@api.route('/log', methods=['GET', 'POST'])
-def log():
-  """
-  Log and print the HTTP request
-  """
-  g.uuid = uuid.uuid1().hex
-  req_data = save_request(g.uuid, request)
-  resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
-  resp.set_cookie('cookie-name', value='cookie-value')
-  return resp
+@api.route('/log')
+class log(Resource):
+  get(self):
+    """
+    Log and print the HTTP request
+    """
+    g.uuid = uuid.uuid1().hex
+    req_data = save_request(g.uuid, request)
+    resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
+    resp.set_cookie('cookie-name', value='cookie-value')
+    return resp
 
 # Return current hostname
 @api.route('/name', methods=['GET'])
-def myname():
+class myname(Resource):
   """
   Hostname of current server
   """
-  g.uuid = uuid.uuid1().hex
-  try:
-    return os.environ.get('NAME','Name not set')
-  except:
-    return "Name not available", 501
+  def get(self):
+    g.uuid = uuid.uuid1().hex
+    try:
+      return os.environ.get('NAME','Name not set')
+    except:
+      return "Name not available", 501
   
 # Document doh-proxy
-@api.route('/dns-query?name=<string:name>', methods=['GET'])
-def dnsquery():
-  """
-  Dns over HTTP: example: /dns-query?name=cnn.com
-  """
-  g.uuid = uuid.uuid1().hex
-  return "Documentation", 200
+@api.route('/dns-query?name=<string:name>')
+class dnsquery(Resource):
+  def get(self):
+    """
+    Dns over HTTP: example: /dns-query?name=cnn.com
+    """
+    g.uuid = uuid.uuid1().hex
+    return "Documentation", 200
   
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
