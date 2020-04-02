@@ -116,15 +116,17 @@ class dnsquery(Resource):
 @api.route('/whois/<string:whois_name>')
 class whois(Resource,):
   def get(self, whois_name):
-    domain = whois_query.query(whois_name)
-    retval = {'expiration_date': domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S"), 
-              'last_updated': domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S"), 
-              'registrar': domain.registrar, 
-              'name': domain.name, 
-              'creation_date': domain.creation_date..strftime("%m/%d/%Y, %H:%M:%S"),
-             }
-    return retval
-
+    try:
+      domain = whois_query.query(whois_name)
+      retval = {'expiration_date': domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S"), 
+                'last_updated': domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S"), 
+                'registrar': domain.registrar, 
+                'name': domain.name, 
+                'creation_date': domain.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
+               }
+      return retval
+    except:
+      return "Whois not available", 501
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Process cli options')
