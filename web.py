@@ -119,7 +119,7 @@ class whois(Resource,):
     try:
       domain = whois_query.query(whois_name)
       retval = { 'registrar': domain.registrar, 
-                 'name_servers': str(domain.name_servers).replace('{','[').replace('}',']'),
+                 'name_servers': list(domain.name_servers),
                  'status': domain.status,
                  'name': domain.name, 
                }
