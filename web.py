@@ -126,7 +126,7 @@ class myname(Resource):
 
 @api.route('/dnsq/<string:name>')
 class dnsq(Resource):
-  @api.expect(api_args)
+  @api.expect(api_parser)
   def get(self,name):
     
     """
