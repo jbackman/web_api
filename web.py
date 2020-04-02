@@ -10,6 +10,7 @@ import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
+import requests
 
 app = Flask(__name__)
 api = Api(app)
@@ -133,9 +134,9 @@ class dnsq(Resource):
     Dns over HTTP
     """
     api_args = api_parser.parse_args()
-    scheme = api_args.get('scheme') 
-    host = api_args.get('host')
-    port = api_args.get('port')
+    scheme = api_args.get('scheme', doh_scheme ) 
+    host = api_args.get('host', doh_host)
+    port = api_args.get('port', doh_port)
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     print(url)
@@ -180,7 +181,10 @@ if __name__ == '__main__':
                       help='DNS over http host')      
   cli_parser.add_argument('--doh-port', type=str, default='8053',
                       help='DNS over http host')
-  cli_parser.add_argument('--doh-secure', type=str, choices=['http', 'https'], default='http',
-                      help='Use DNS over https')                                                                          
+  cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
+                      help='DNS over http scheme')                                                                          
   args = cli_parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
+  global doh_host = args.doh_host
+  global doh_port = args.doh_port
+  global doh_scheme = args.doh_scheme
