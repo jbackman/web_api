@@ -124,10 +124,10 @@ class dnsq(Resource):
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
-    host = args.host
-    port = args.port
+    host = args.doh-host
+    port = args.doh-port
     name = name
-    scheme =  'http' if args.doh_secure else 'https'
+    scheme =  'http' if args.doh-secure else 'https'
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     try: 
       r = requests.get(url)
