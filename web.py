@@ -9,7 +9,7 @@ import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api
-import whois
+import whois as whois_query
 
 app = Flask(__name__)
 api = Api(app)
@@ -114,9 +114,9 @@ class dnsquery(Resource):
  
 # Whois endpoint
 @api.route('/whois?<string:whois_name>')
-class whois_query(Resource):
+class whois(Resource):
   def get(self):
-    domain = whois.query(whois_name)
+    domain = whois_query.query(whois_name)
     return domain
 
 
