@@ -40,14 +40,12 @@ def save_request(uuid, request):
     req_data['files'] = files
   return req_data
 
-'''
-@api.after_request
+@app.after_request
 def after_request(resp):
   resp.headers.add('Access-Control-Allow-Origin', '*')
   resp.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-Token')
-  resp.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  resp.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, HEAD')
   return resp
-'''
 
 # Return client IP
 @api.route('/ip')
