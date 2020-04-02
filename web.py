@@ -65,15 +65,14 @@ class ip(Resource):
 # Return data about the request
 @api.route('/log')
 class log(Resource):
-  def get(self):
-    """
-    Log and print the HTTP request
-    """
-    g.uuid = uuid.uuid1().hex
-    req_data = save_request(g.uuid, request)
-    resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
-    resp.set_cookie('cookie-name', value='cookie-value')
-    return resp
+  """
+  Log and print the HTTP request
+  """
+  g.uuid = uuid.uuid1().hex
+  req_data = save_request(g.uuid, request)
+  resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
+  resp.set_cookie('cookie-name', value='cookie-value')
+  return resp
 
 # Return current hostname
 @api.route('/name', methods=['GET'])
