@@ -61,7 +61,7 @@ class ip(Resource):
     try:
       headers_list = request.headers.getlist("X-Forwarded-For")
       user_ip = headers_list[0] if headers_list else request.remote_addr
-      return jsonify({'ip': user_ip}), 200
+      return {'ip': user_ip}
     except:
       return "IP not available", 501
 
