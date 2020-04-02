@@ -116,8 +116,8 @@ class dnsquery(Resource):
 @api.route('/whois/<string:whois_name>')
 class whois(Resource,):
   def get(self,**kwargs):
-    domain = whois_query.query('jitonline.net')
-    return domain
+    domain = whois_query.query(whois_name)
+    return domain.__dict__
 
 
 if __name__ == '__main__':
