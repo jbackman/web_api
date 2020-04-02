@@ -68,12 +68,26 @@ class log(Resource):
   """
   Log and print the HTTP request
   """
-  g.uuid = uuid.uuid1().hex
-  req_data = save_request(g.uuid, request)
-  resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
-  resp.set_cookie('cookie-name', value='cookie-value')
-  return resp
-
+  
+  def __init__(self):
+    g.uuid = uuid.uuid1().hex
+    req_data = save_request(g.uuid, request)
+    self.resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
+    self.resp.set_cookie('cookie-name', value='cookie-value')
+    
+  def get(self):
+    return self.resp
+  def post(self):
+    return self.resp
+  def put(self):
+    return self.resp
+  def delete(self):
+    return self.resp
+  def patch(self):
+    return self.resp
+  
+  
+  
 # Return current hostname
 @api.route('/name', methods=['GET'])
 class myname(Resource):
