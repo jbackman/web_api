@@ -126,8 +126,7 @@ class whois(Resource,):
       retval['expiration_date'] = "" if domain.expiration_date is None else domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S") 
       retval['last_updated'] =  "" if domain.last_updated is None else domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       retval['creation_date'] =  "" if domain.creation_date is None else domain.creation_date.strftime("%m/%d/%Y, %H:%M:%S")
-      print (retval)
-      return retval
+      return Response(json.dumps(retval, indent=4), mimetype='application/json')
     except:
       return "Whois not available", 501
 
