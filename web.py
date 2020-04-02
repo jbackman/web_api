@@ -13,6 +13,7 @@ import whois as whois_query
 
 app = Flask(__name__)
 api = Api(app)
+app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
 
 
