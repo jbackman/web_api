@@ -126,7 +126,7 @@ if __name__ == '__main__':
                       help='IP to listen on')
   parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
-  parser.add_argument('-d', '--debug', type=bool, default=True,
+  parser.add_argument('-d', '--debug', type=bool, default=False,
                       help='Set Debug on/off')
   args = parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
