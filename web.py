@@ -191,16 +191,8 @@ if __name__ == '__main__':
   args = cli_parser.parse_args()
   app.run(host=args.listen, 
           port=args.port, 
-          debug=args.debug, 
-          doh_host = args.doh_host,
-          doh_port = args.doh_port,
-          doh_scheme = args.doh_scheme,
+          debug=args.debug
          )
-  '''
-  global doh_host
-  global doh_port
-  global doh_scheme
   doh_host = args.doh_host
   doh_port = args.doh_port
   doh_scheme = args.doh_scheme
-  '''
