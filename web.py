@@ -67,11 +67,11 @@ class ip(Resource):
 # Return data about the request
 @api.route('/log')
 class log(Resource):
-  """
-  Log and print the HTTP request
-  """
   
   def return_data(self):
+    """
+    Log and print the HTTP request for POST
+    """
     g.uuid = uuid.uuid1().hex
     req_data = save_request(g.uuid, request)
     self.resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
@@ -79,38 +79,61 @@ class log(Resource):
     return(self.resp)
     
   def get(self):
+    """
+    Log and print the HTTP request for GET
+    """
     return self.return_data()
   def post(self):
+    """
+    Log and print the HTTP request for POST
+    """
     return self.return_data()
   def put(self):
+    """
+    Log and print the HTTP request for PUT
+    """
     return self.return_data()
   def delete(self):
+    """
+    Log and print the HTTP request for DELETE
+    """
     return self.return_data()
   def patch(self):
+    """
+    Log and print the HTTP request for PATCH
+    """
     return self.return_data()
   
   
 # Return current hostname
 @api.route('/name', methods=['GET'])
 class myname(Resource):
-  """
-  Hostname of current server
-  """
   def get(self):
-    g.uuid = uuid.uuid1().hex
+    """
+    Hostname of current server
+    """
     try:
       return os.environ.get('NAME','Name not set')
     except:
       return "Name not available", 501
   
-# Document doh-proxy
-@api.route('/dns-query?name=<string:name>')
-class dnsquery(Resource):
-  def get(self):
+# DNS over HTTP 
+@api.route('/dnsq/<string:name>')
+class dnsq(Resource):
+  def get(self,name):
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
-    g.uuid = uuid.uuid1().hex
+    host = args.host
+    port = args.port
+    name = name
+    scheme =  'http' if args.doh_secure else 'https'
+    url = f'{scheme}://{host}:{port}/dns-query?name={name}'
+    try: 
+      r = requests.get(url)
+    except: 
+      return "Cannot contact Dns over HTTP server", 501
+                                                                               
     return "Documentation", 200
  
 # Whois endpoint
@@ -139,5 +162,11 @@ if __name__ == '__main__':
                       help='port to listen on')
   parser.add_argument('-d', '--debug', type=bool, default=False,
                       help='Set Debug on/off')
+  parser.add_argument('--doh-host', type=str, default='127.0.0.1',
+                      help='DNS over http host')      
+  parser.add_argument('--doh-port', type=str, default='8053',
+                      help='DNS over http host')
+  parser.add_argument('--doh-secure', type=bool, default=False,
+                      help='Use DNS over https')                                                                          
   args = parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
