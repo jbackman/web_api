@@ -19,7 +19,6 @@ api_parser = reqparse.RequestParser()
 api_parser.add_argument('host', type=str, help='DNS over http host')     
 api_parser.add_argument('port', type=str, help='DNS over http port')
 api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
-api_args = api_parser.parse_args()
 
 
 def save_request(uuid, request):
@@ -142,6 +141,7 @@ class dnsq(Resource):
     host = args.doh_host if request.args.get('host') is None else request.args.get('host')
     port = args.doh_port if request.args.get('port') is None else request.args.get('port')
     """
+    api_args = api_parser.parse_args()
     if api_args.get('scheme') and api_args.get('scheme') in ('http','https'):
       scheme = api_args.get('scheme')
     else:
