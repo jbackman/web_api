@@ -49,14 +49,7 @@ def after_request(resp):
   return resp
 '''
 
-# Return documentation
-@api.route('/', defaults={'u_path': ''})
-@api.route('/<path:u_path>')
-def default(u_path):
-  return auto.html()
-
 # Return client IP
-
 @api.route('/ip', methods=['GET'])
 def ip():
   """
