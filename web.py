@@ -135,7 +135,7 @@ class dnsq(Resource):
     api_args = api_parser.parse_args()
     scheme = api_args.get('scheme') 
     host = api_args.get('host')
-    port = args.get('port')
+    port = api_args.get('port')
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     print(url)
