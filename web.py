@@ -77,15 +77,15 @@ class log(Resource):
     return(self.resp)
     
   def get(self):
-    return self.return_data(self)
+    return self.return_data()
   def post(self):
-    return self.return_data(self)
+    return self.return_data()
   def put(self):
-    return self.return_data(self)
+    return self.return_data()
   def delete(self):
-    return self.return_data(self)
+    return self.return_data()
   def patch(self):
-    return self.return_data(self)  
+    return self.return_data()
   
   
 # Return current hostname
