@@ -118,13 +118,15 @@ class whois(Resource,):
   def get(self, whois_name):
     try:
       domain = whois_query.query(whois_name)
-      print(domain.__dict__)
-      retval = {'expiration_date': domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S"), 
-                'last_updated': domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S"), 
-                'registrar': domain.registrar, 
-                'name': domain.name, 
-                'creation_date': domain.creation_date.strftime("%m/%d/%Y, %H:%M:%S"),
+      retval = { 'registrar': domain.registrar, 
+                 'name_servers': domain.name_servers,
+                 'status': domain.status,
+                 'name': domain.name, 
                }
+      retval['expiration_date'] = "" if domain.expiration_date is None else domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S") 
+      retval['last_updated'] =  "" if domain.last_updated is None else domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+      retval['creation_date'] =  "" if domain.creation_date is None else domain.creation_date.strftime("%m/%d/%Y, %H:%M:%S")
+      print (retval)
       return retval
     except:
       return "Whois not available", 501
