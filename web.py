@@ -133,6 +133,9 @@ class dnsq(Resource):
     """
     Dns over HTTP
     """
+    global doh_host
+    global doh_port
+    global doh_scheme
     api_args = api_parser.parse_args()
     scheme = api_args.get('scheme', doh_scheme ) 
     host = api_args.get('host', doh_host)
