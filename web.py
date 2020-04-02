@@ -8,13 +8,19 @@ import uuid
 import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
-from flask_restx import Resource, Api, reqparse
+from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
 
 app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
+api_parser = reqparse.RequestParser()
+api_parser.add_argument('host', type=str, help='DNS over http host')     
+api_parser.add_argument('port', type=str, help='DNS over http port')
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
+api_args = api_parser.parse_args()
+
 
 def save_request(uuid, request):
   req_data = {}
@@ -117,20 +123,13 @@ class myname(Resource):
       return "Name not available", 501
   
 # DNS over HTTP 
-resource_fields = api.model('Resource', {
-    'host': fields.String,
-    'port': fields.String,
-    'scheme': fields.String
-})
+
+
 @api.route('/dnsq/<string:name>')
 class dnsq(Resource):
-  @api.expect(resource_fields)
+  @api.expect(api_args)
   def get(self,name):
-    api_parser = reqparse.RequestParser()
-    api_parser.add_argument('host', type=str, help='DNS over http host')     
-    api_parser.add_argument('port', type=str, help='DNS over http port')
-    api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
-    api_args = api_parser.parse_args()
+    
     """
     Dns over HTTP: example: /dns-query?name=cnn.com
     """
