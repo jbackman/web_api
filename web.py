@@ -69,23 +69,23 @@ class log(Resource):
   Log and print the HTTP request
   """
   
-  def __init__():
+  def return_data(self):
     g.uuid = uuid.uuid1().hex
     req_data = save_request(g.uuid, request)
     self.resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
     self.resp.set_cookie('cookie-name', value='cookie-value')
+    return(self.resp)
     
   def get(self):
-    return self.resp
+    return return_data(self)
   def post(self):
-    return self.resp
+    return return_data(self)
   def put(self):
-    return self.resp
+    return return_data(self)
   def delete(self):
-    return self.resp
+    return return_data(self)
   def patch(self):
-    return self.resp
-  
+    return return_data(self)  
   
   
 # Return current hostname
