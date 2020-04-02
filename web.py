@@ -147,8 +147,7 @@ class dnsq(Resource):
     print(url)
     try: 
       r = requests.get(url)
-      print(r.json)
-      Response(json.dumps(r.json, indent=4), mimetype='application/json')
+      Response(json.dumps(r.text, indent=4), mimetype='application/json')
     except: 
       return "Cannot contact Dns over HTTP server", 501
                                                                                
