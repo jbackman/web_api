@@ -10,6 +10,7 @@ import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
+import requests
 
 app = Flask(__name__)
 api = Api(app)
@@ -19,7 +20,9 @@ api_parser = reqparse.RequestParser()
 api_parser.add_argument('host', type=str, help='DNS over http host', default='127.0.0.1')     
 api_parser.add_argument('port', type=str, help='DNS over http port', default='8053')
 api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default='http')
-
+doh_host = ""
+doh_port = ""
+doh_scheme = ""
 
 def save_request(uuid, request):
   req_data = {}
@@ -132,20 +135,22 @@ class dnsq(Resource):
     """
     Dns over HTTP
     """
+    global doh_host
+    global doh_port
+    global doh_scheme
     api_args = api_parser.parse_args()
-    scheme = api_args.get('scheme') 
-    host = api_args.get('host')
-    port = api_args.get('port')
+    scheme = api_args.get('scheme', doh_scheme ) 
+    host = api_args.get('host', doh_host)
+    port = api_args.get('port', doh_port)
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     print(url)
     try: 
       r = requests.get(url)
-      Response(json.dumps(r.data, indent=4), mimetype='application/json')
+      return Response(json.dumps(r.json(), indent=4), mimetype='application/json')
     except: 
       return "Cannot contact Dns over HTTP server", 501
                                                                                
-    return "Documentation", 200
 
   
 # Whois endpoint
@@ -179,7 +184,13 @@ if __name__ == '__main__':
                       help='DNS over http host')      
   cli_parser.add_argument('--doh-port', type=str, default='8053',
                       help='DNS over http host')
-  cli_parser.add_argument('--doh-secure', type=str, choices=['http', 'https'], default='http',
-                      help='Use DNS over https')                                                                          
+  cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
+                      help='DNS over http scheme')                                                                          
   args = cli_parser.parse_args()
-  app.run(host=args.listen, port=args.port, debug=args.debug)
+  app.run(host=args.listen, 
+          port=args.port, 
+          debug=args.debug
+         )
+  doh_host = args.doh_host
+  doh_port = args.doh_port
+  doh_scheme = args.doh_scheme
