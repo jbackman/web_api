@@ -118,6 +118,7 @@ class whois(Resource,):
   def get(self, whois_name):
     try:
       domain = whois_query.query(whois_name)
+      print(domain.__dict__)
       retval = {'expiration_date': domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S"), 
                 'last_updated': domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S"), 
                 'registrar': domain.registrar, 
