@@ -130,21 +130,12 @@ class dnsq(Resource):
   def get(self,name):
     
     """
-    Dns over HTTP: example: /dns-query?name=cnn.com
-    """
-    """
-    if request.args.get('scheme') and request.args.get('scheme') in ('http','https'):
-      scheme = request.args.get('scheme')
-    else:
-      scheme = args.doh_secure  
-    password = request.args.get('password')
-    host = args.doh_host if request.args.get('host') is None else request.args.get('host')
-    port = args.doh_port if request.args.get('port') is None else request.args.get('port')
+    Dns over HTTP
     """
     api_args = api_parser.parse_args()
     scheme = api_args.get('scheme') 
-    host = args.doh_host
-    port = args.doh_port
+    host = api_args.get('host')
+    port = args.get('port')
     name = name
     url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
     print(url)
