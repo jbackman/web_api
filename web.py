@@ -8,11 +8,17 @@ import uuid
 import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
-from flask_selfdoc import Autodoc
+from flask_restx import Resource, Api, reqparse, fields
+import whois as whois_query
 
 app = Flask(__name__)
-auto = Autodoc(app)
+api = Api(app)
+app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
+api_parser = reqparse.RequestParser()
+api_parser.add_argument('host', type=str, help='DNS over http host')     
+api_parser.add_argument('port', type=str, help='DNS over http port')
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme')
 
 
 def save_request(uuid, request):
@@ -44,73 +50,148 @@ def save_request(uuid, request):
 def after_request(resp):
   resp.headers.add('Access-Control-Allow-Origin', '*')
   resp.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-Token')
-  resp.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  resp.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, HEAD')
   return resp
 
-# Return documentation
-@app.route('/', defaults={'u_path': ''})
-@app.route('/<path:u_path>')
-def default(u_path):
-  return auto.html()
-
 # Return client IP
-@auto.doc()
-@app.route('/ip', methods=['GET'])
-def ip():
+@api.route('/ip')
+class ip(Resource):
   """
   Returns the requester IP
   """
-  g.uuid = uuid.uuid1().hex
-  try:
-    headers_list = request.headers.getlist("X-Forwarded-For")
-    user_ip = headers_list[0] if headers_list else request.remote_addr
-    return jsonify({'ip': user_ip}), 200
-  except:
-    return "IP not available", 501
+  def get(self):
+    g.uuid = uuid.uuid1().hex
+    try:
+      headers_list = request.headers.getlist("X-Forwarded-For")
+      user_ip = headers_list[0] if headers_list else request.remote_addr
+      return {'ip': user_ip}
+    except:
+      return "IP not available", 501
 
 # Return data about the request
-@app.route('/log', methods=['GET', 'POST'])
-@auto.doc()
-def log():
-  """
-  Log and print the HTTP request
-  """
-  g.uuid = uuid.uuid1().hex
-  req_data = save_request(g.uuid, request)
-  resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
-  resp.set_cookie('cookie-name', value='cookie-value')
-  return resp
-
+@api.route('/log')
+class log(Resource):
+  
+  def return_data(self):
+    """
+    Log and print the HTTP request for POST
+    """
+    g.uuid = uuid.uuid1().hex
+    req_data = save_request(g.uuid, request)
+    self.resp = Response(json.dumps(req_data, indent=4), mimetype='application/json')
+    self.resp.set_cookie('cookie-name', value='cookie-value')
+    return(self.resp)
+    
+  def get(self):
+    """
+    Log and print the HTTP request for GET
+    """
+    return self.return_data()
+  def post(self):
+    """
+    Log and print the HTTP request for POST
+    """
+    return self.return_data()
+  def put(self):
+    """
+    Log and print the HTTP request for PUT
+    """
+    return self.return_data()
+  def delete(self):
+    """
+    Log and print the HTTP request for DELETE
+    """
+    return self.return_data()
+  def patch(self):
+    """
+    Log and print the HTTP request for PATCH
+    """
+    return self.return_data()
+  
+  
 # Return current hostname
-@app.route('/name', methods=['GET'])
-@auto.doc()
-def myname():
-  """
-  Hostname of current server
-  """
-  g.uuid = uuid.uuid1().hex
-  try:
-    return os.environ.get('NAME','Name not set')
-  except:
-    return "Name not available", 501
+@api.route('/name', methods=['GET'])
+class myname(Resource):
+  def get(self):
+    """
+    Hostname of current server
+    """
+    try:
+      return os.environ.get('NAME','Name not set')
+    except:
+      return "Name not available", 501
   
-# Document doh-proxy
-@app.route('/dns-query', methods=['GET'])
-@auto.doc()
-def dnsquery():
-  """
-  Dns over HTTP: example: /dns-query?name=cnn.com
-  """
-  g.uuid = uuid.uuid1().hex
-  return "Documentation", 200
+# DNS over HTTP 
+
+
+@api.route('/dnsq/<string:name>')
+class dnsq(Resource):
+  @api.expect(api_parser)
+  def get(self,name):
+    
+    """
+    Dns over HTTP: example: /dns-query?name=cnn.com
+    """
+    """
+    if request.args.get('scheme') and request.args.get('scheme') in ('http','https'):
+      scheme = request.args.get('scheme')
+    else:
+      scheme = args.doh_secure  
+    password = request.args.get('password')
+    host = args.doh_host if request.args.get('host') is None else request.args.get('host')
+    port = args.doh_port if request.args.get('port') is None else request.args.get('port')
+    """
+    api_args = api_parser.parse_args()
+    if api_args.get('scheme') and api_args.get('scheme') in ('http','https'):
+      scheme = api_args.get('scheme')
+    else:
+      scheme = args.doh_secure  
+    host = args.doh_host if api_args.get('host') is None else api_args.get('host')
+    port = args.doh_port if api_args.get('port') is None else api_args.get('port')
+    name = name
+    url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
+    print(url)
+    try: 
+      r = requests.get(url)
+      Response(json.dumps(r.data, indent=4), mimetype='application/json')
+    except: 
+      return "Cannot contact Dns over HTTP server", 501
+                                                                               
+    return "Documentation", 200
+
   
+# Whois endpoint
+@api.route('/whois/<string:whois_name>')
+class whois(Resource,):
+  def get(self, whois_name):
+    try:
+      domain = whois_query.query(whois_name)
+      retval = { 'registrar': domain.registrar, 
+                 'name_servers': list(domain.name_servers),
+                 'status': domain.status,
+                 'name': domain.name, 
+               }
+      retval['expiration_date'] = "" if domain.expiration_date is None else domain.expiration_date.strftime("%m/%d/%Y, %H:%M:%S") 
+      retval['last_updated'] =  "" if domain.last_updated is None else domain.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+      retval['creation_date'] =  "" if domain.creation_date is None else domain.creation_date.strftime("%m/%d/%Y, %H:%M:%S")
+      return Response(json.dumps(retval, indent=4), mimetype='application/json')
+    except:
+      return "Whois not available", 501
+
+    
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Process cli options')
-  parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
+  cli_parser = argparse.ArgumentParser(description='Process cli options')
+  cli_parser.add_argument('-l', '--listen', type=str, default='0.0.0.0',
                       help='IP to listen on')
-  parser.add_argument('-p', '--port', type=int, default=80,
+  cli_parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
-  parser.add_argument('-d', '--debug', type=bool, default=False,
+  cli_parser.add_argument('-d', '--debug', type=bool, default=False,
                       help='Set Debug on/off')
-  args = parser.parse_args()
+  cli_parser.add_argument('--doh-host', type=str, default='127.0.0.1',
+                      help='DNS over http host')      
+  cli_parser.add_argument('--doh-port', type=str, default='8053',
+                      help='DNS over http host')
+  cli_parser.add_argument('--doh-secure', type=str, choices=['http', 'https'], default='http',
+                      help='Use DNS over https')                                                                          
+  args = cli_parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
