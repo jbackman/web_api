@@ -67,7 +67,7 @@ class ip(Resource):
 # Return data about the request
 @api.route('/log')
 class log(Resource):
-  get(self):
+  def get(self):
     """
     Log and print the HTTP request
     """
