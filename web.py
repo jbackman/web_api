@@ -8,10 +8,10 @@ import uuid
 import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
-from flask_selfdoc import Autodoc
+from flask_restplus import Resource, Api
 
 app = Flask(__name__)
-auto = Autodoc(app)
+api = Api(app)
 app.debug = False
 
 
@@ -40,7 +40,7 @@ def save_request(uuid, request):
     req_data['files'] = files
   return req_data
 
-@app.after_request
+@api.after_request
 def after_request(resp):
   resp.headers.add('Access-Control-Allow-Origin', '*')
   resp.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-Token')
@@ -48,14 +48,14 @@ def after_request(resp):
   return resp
 
 # Return documentation
-@app.route('/', defaults={'u_path': ''})
-@app.route('/<path:u_path>')
+@api.route('/', defaults={'u_path': ''})
+@api.route('/<path:u_path>')
 def default(u_path):
   return auto.html()
 
 # Return client IP
-@auto.doc()
-@app.route('/ip', methods=['GET'])
+
+@api.route('/ip', methods=['GET'])
 def ip():
   """
   Returns the requester IP
@@ -69,8 +69,7 @@ def ip():
     return "IP not available", 501
 
 # Return data about the request
-@app.route('/log', methods=['GET', 'POST'])
-@auto.doc()
+@api.route('/log', methods=['GET', 'POST'])
 def log():
   """
   Log and print the HTTP request
@@ -82,8 +81,7 @@ def log():
   return resp
 
 # Return current hostname
-@app.route('/name', methods=['GET'])
-@auto.doc()
+@api.route('/name', methods=['GET'])
 def myname():
   """
   Hostname of current server
@@ -95,8 +93,7 @@ def myname():
     return "Name not available", 501
   
 # Document doh-proxy
-@app.route('/dns-query', methods=['GET'])
-@auto.doc()
+@api.route('/dns-query?name=<string:name>', methods=['GET'])
 def dnsquery():
   """
   Dns over HTTP: example: /dns-query?name=cnn.com
