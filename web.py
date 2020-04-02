@@ -147,11 +147,10 @@ class dnsq(Resource):
     print(url)
     try: 
       r = requests.get(url)
-      Response(json.dumps(r.text, indent=4), mimetype='application/json')
+      return Response(json.dumps(r.json(), indent=4), mimetype='application/json')
     except: 
       return "Cannot contact Dns over HTTP server", 501
                                                                                
-    return "Documentation", 200
 
   
 # Whois endpoint
