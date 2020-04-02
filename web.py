@@ -115,7 +115,7 @@ class dnsquery(Resource):
 # Whois endpoint
 @api.route('/whois/<string:whois_name>')
 class whois(Resource,):
-  def get(self,**kwargs):
+  def get(self, whois_name):
     domain = whois_query.query(whois_name)
     return domain.__dict__
 
