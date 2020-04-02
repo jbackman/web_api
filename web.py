@@ -20,7 +20,9 @@ api_parser = reqparse.RequestParser()
 api_parser.add_argument('host', type=str, help='DNS over http host', default='127.0.0.1')     
 api_parser.add_argument('port', type=str, help='DNS over http port', default='8053')
 api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default='http')
-
+doh_host = ""
+doh_port = ""
+doh_scheme = ""
 
 def save_request(uuid, request):
   req_data = {}
