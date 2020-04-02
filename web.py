@@ -20,7 +20,9 @@ api_parser = reqparse.RequestParser()
 api_parser.add_argument('host', type=str, help='DNS over http host', default='127.0.0.1')     
 api_parser.add_argument('port', type=str, help='DNS over http port', default='8053')
 api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default='http')
-
+global doh_host
+global doh_port
+global doh_scheme
 
 def save_request(uuid, request):
   req_data = {}
@@ -185,6 +187,7 @@ if __name__ == '__main__':
                       help='DNS over http scheme')                                                                          
   args = cli_parser.parse_args()
   app.run(host=args.listen, port=args.port, debug=args.debug)
-  global doh_host = args.doh_host
-  global doh_port = args.doh_port
-  global doh_scheme = args.doh_scheme
+  doh_host = args.doh_host
+  doh_port = args.doh_port
+  doh_scheme = args.doh_scheme
+
