@@ -144,7 +144,7 @@ class dnsq(Resource):
     host = api_args.get('host', doh_host)
     port = api_args.get('port', doh_port)
     name = name
-    url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
+    url = "{}://{}:{}/dns-query?name={}".format( scheme.lower(), host.lower(), port, name.lower() )
     print(url)
     try: 
       r = requests.get(url)
