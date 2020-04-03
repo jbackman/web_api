@@ -16,13 +16,16 @@ app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
+
+doh_host=os.environ.get('DOHHOST',"127.0.0.1")
+doh_port=os.environ.get('DOHPORT',"8053")
+doh_scheme=os.environ.get('DOHSCHEME',"http")
+
 api_parser = reqparse.RequestParser()
-api_parser.add_argument('host', type=str, help='DNS over http host', default='127.0.0.1')     
-api_parser.add_argument('port', type=str, help='DNS over http port', default='8053')
-api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default='http')
-doh_host = ""
-doh_port = ""
-doh_scheme = ""
+api_parser.add_argument('host', type=str, help='DNS over http host', default=doh_host)
+api_parser.add_argument('port', type=str, help='DNS over http port', default=doh_port)
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=doh_scheme)
+
 
 def save_request(uuid, request):
   req_data = {}
@@ -143,7 +146,7 @@ class dnsq(Resource):
     host = api_args.get('host', doh_host)
     port = api_args.get('port', doh_port)
     name = name
-    url = "{}://{}:{}/dns-query?name={}".format( scheme, host, port, name )
+    url = "{}://{}:{}/dns-query?name={}".format( scheme.lower(), host.lower(), port, name.lower() )
     print(url)
     try: 
       r = requests.get(url)
@@ -179,18 +182,9 @@ if __name__ == '__main__':
   cli_parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
   cli_parser.add_argument('-d', '--debug', type=bool, default=False,
-                      help='Set Debug on/off')
-  cli_parser.add_argument('--doh-host', type=str, default='127.0.0.1',
-                      help='DNS over http host')      
-  cli_parser.add_argument('--doh-port', type=str, default='8053',
-                      help='DNS over http host')
-  cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
-                      help='DNS over http scheme')                                                                          
+                      help='Set Debug on/off')                                                                         
   args = cli_parser.parse_args()
   app.run(host=args.listen, 
           port=args.port, 
           debug=args.debug
          )
-  doh_host = args.doh_host
-  doh_port = args.doh_port
-  doh_scheme = args.doh_scheme
