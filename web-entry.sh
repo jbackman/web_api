@@ -19,7 +19,7 @@ do
  esac
 done
 export NAME
-case $action inn
+case $action in
   debug)
     echo "Running in Debug mode"
     export FLASK_APP=web.py
