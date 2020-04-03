@@ -11,6 +11,7 @@ from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
 import requests
+from web_config import *
 
 app = Flask(__name__)
 api = Api(app)
@@ -18,9 +19,10 @@ app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
 
 api_parser = reqparse.RequestParser()
-doh_host = ""
-doh_port = ""
-doh_scheme = ""
+api_parser.add_argument('host', type=str, help='DNS over http host', default=doh_host)     
+api_parser.add_argument('port', type=str, help='DNS over http port', default=doh_port)
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=doh_scheme)
+
 
 def save_request(uuid, request):
   req_data = {}
@@ -177,17 +179,8 @@ if __name__ == '__main__':
   cli_parser.add_argument('-p', '--port', type=int, default=5000,
                       help='port to listen on')
   cli_parser.add_argument('-d', '--debug', type=bool, default=False,
-                      help='Set Debug on/off')
-  cli_parser.add_argument('--doh-host', type=str, default='127.0.0.1',
-                      help='DNS over http host')      
-  cli_parser.add_argument('--doh-port', type=str, default='8053',
-                      help='DNS over http host')
-  cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
-                      help='DNS over http scheme')                                                                          
+                      help='Set Debug on/off')                                                                         
   args = cli_parser.parse_args()
-  api_parser.add_argument('host', type=str, help='DNS over http host', default=args.doh_host)     
-  api_parser.add_argument('port', type=str, help='DNS over http port', default=args.doh_port)
-  api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=args.doh_scheme)
   app.run(host=args.listen, 
           port=args.port, 
           debug=args.debug
