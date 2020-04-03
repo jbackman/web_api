@@ -11,18 +11,20 @@ from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
 import requests
-from web_config import *
 
 app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
 
+doh_host=os.environ.get('DOHHOST',"127.0.0.1")
+doh_port=os.environ.get('DOHPORT',"8053")
+doh_scheme=os.environ.get('DOHSCHEME',"http")
+
 api_parser = reqparse.RequestParser()
-api_parser.add_argument('host', type=str, help='DNS over http host', default=os.environ.get('DOH_HOST',doh_host))     
-api_parser.add_argument('port', type=str, help='DNS over http port', default=os.environ.get('DOH_PORT',doh_port))
-api_parser.add_argument('scheme', type=str, help='DNS over http scheme', 
-                        choices=['http', 'https'], default=os.environ.get('DOH_SCHEME',doh_scheme))
+api_parser.add_argument('host', type=str, help='DNS over http host', default=doh_host)
+api_parser.add_argument('port', type=str, help='DNS over http port', default=doh_port)
+api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=doh_scheme)
 
 
 def save_request(uuid, request):
