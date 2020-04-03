@@ -16,6 +16,8 @@ app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.debug = False
+
+api_parser = reqparse.RequestParser()
 doh_host = ""
 doh_port = ""
 doh_scheme = ""
@@ -183,7 +185,6 @@ if __name__ == '__main__':
   cli_parser.add_argument('--doh-scheme', type=str, choices=['http', 'https'], default='http',
                       help='DNS over http scheme')                                                                          
   args = cli_parser.parse_args()
-  api_parser = reqparse.RequestParser()
   api_parser.add_argument('host', type=str, help='DNS over http host', default=args.doh_host)     
   api_parser.add_argument('port', type=str, help='DNS over http port', default=args.doh_port)
   api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=args.doh_scheme)
