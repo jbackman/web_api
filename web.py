@@ -10,6 +10,7 @@ import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
 import whois as whois_query
+import pydig
 import requests
 
 app = Flask(__name__)
@@ -26,6 +27,9 @@ api_parser.add_argument('host', type=str, help='DNS over http host', default=doh
 api_parser.add_argument('port', type=str, help='DNS over http port', default=doh_port)
 api_parser.add_argument('scheme', type=str, help='DNS over http scheme', choices=['http', 'https'], default=doh_scheme)
 
+api_dig_parser = reqparse.RequestParser()
+api_dig_parser.add_argument('type', type=str, help='Type of Record to Query', 
+                            choices=['A','AAAA','CNAME','MX','NS','PTR','TXT','DNSKEY','DS','CDNSKEY','CDS','SOA'], default="A")
 
 def save_request(uuid, request):
   req_data = {}
@@ -128,8 +132,6 @@ class myname(Resource):
       return "Name not available", 501
   
 # DNS over HTTP 
-
-
 @api.route('/dnsq/<string:name>')
 class dnsq(Resource):
   @api.expect(api_parser)
@@ -152,8 +154,7 @@ class dnsq(Resource):
       r = requests.get(url)
       return Response(json.dumps(r.json(), indent=4), mimetype='application/json')
     except: 
-      return "Cannot contact Dns over HTTP server", 501
-                                                                               
+      return "Cannot contact Dns over HTTP server", 501                                                                        
 
   
 # Whois endpoint
@@ -173,7 +174,23 @@ class whois(Resource,):
       return Response(json.dumps(retval, indent=4), mimetype='application/json')
     except:
       return "Whois not available", 501
-
+    
+    
+# Dig endpoint
+@api.route('/dig/<string:dig_name>')
+class dig(Resource):
+  @api.expect(api_dig_parser)
+  """
+  Returns the results of a dig
+  """
+  def get(self):
+    api_dig_args = api_dig_parser.parse_args()
+    g.uuid = uuid.uuid1().hex
+    try:
+      answer=pydig.query(dig_name,api_dig_args.type)
+      return {'answer': answer}
+    except:
+      return "Dig not available", 501
     
 if __name__ == '__main__':
   cli_parser = argparse.ArgumentParser(description='Process cli options')
