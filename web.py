@@ -140,9 +140,6 @@ class dnsq(Resource):
     """
     Dns over HTTP
     """
-    global doh_host
-    global doh_port
-    global doh_scheme
     api_args = api_parser.parse_args()
     scheme = api_args.get('scheme', doh_scheme ) 
     host = api_args.get('host', doh_host)
@@ -179,6 +176,7 @@ class whois(Resource,):
 # Dig endpoint
 @api.route('/dig/<string:dig_name>')
 class dig(Resource):
+  answer={}
   @api.expect(api_dig_parser)
   def get(self):
     """
@@ -187,10 +185,11 @@ class dig(Resource):
     api_dig_args = api_dig_parser.parse_args()
     g.uuid = uuid.uuid1().hex
     try:
-      answer=pydig.query(dig_name,api_dig_args.type)
-      return {'answer': answer}
+      answer['answer']=pydig.query(dig_name,api_dig_args.type)
+      return  Response(json.dumps(answer, indent=4), mimetype='application/json')
     except:
       return "Dig not available", 501
+    
     
 if __name__ == '__main__':
   cli_parser = argparse.ArgumentParser(description='Process cli options')
