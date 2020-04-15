@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 RUN apk update && \
-	apk add whois
+	apk add whois bind-tools
 RUN mkdir -p /opt/web
 WORKDIR /opt/web
 COPY web* ./
