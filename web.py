@@ -180,10 +180,10 @@ class whois(Resource,):
 @api.route('/dig/<string:dig_name>')
 class dig(Resource):
   @api.expect(api_dig_parser)
-  """
-  Returns the results of a dig
-  """
   def get(self):
+    """
+    Returns the results of a dig
+    """
     api_dig_args = api_dig_parser.parse_args()
     g.uuid = uuid.uuid1().hex
     try:
