@@ -178,7 +178,7 @@ class whois(Resource,):
 class dig(Resource):
   answer={}
   @api.expect(api_dig_parser)
-  def get(self):
+  def get(self, dig_name):
     """
     Returns the results of a dig
     """
