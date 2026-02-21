@@ -3,4 +3,5 @@ flask-restx
 gunicorn
 pydig
 requests
+werkzeug
 whois

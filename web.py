@@ -9,6 +9,7 @@ import tempfile
 import argparse
 from flask import Flask, request, Response, jsonify, g
 from flask_restx import Resource, Api, reqparse, fields
+from werkzeug.middleware.proxy_fix import ProxyFix
 import whois as whois_query
 import pydig
 import requests
@@ -16,6 +17,7 @@ import requests
 app = Flask(__name__)
 api = Api(app)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.debug = False
 
 doh_host=os.environ.get('DOHHOST',"127.0.0.1")
